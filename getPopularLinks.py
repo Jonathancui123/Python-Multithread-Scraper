@@ -22,6 +22,7 @@ if __name__ == '__main__':
     for char in string.ascii_uppercase:
         print(f'Processing letter {char}')
         processPage(browser, baseURL + char, output_filename, failedURLs, "columnist", parseUDPopularHTML)
+        sleep(2)
     browser.quit()
     endTime = time()
     elapsed_time = endTime - startTime

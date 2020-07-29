@@ -23,7 +23,7 @@ def connectPage(browser, URL, signalElemName):
         try:
             browser.get(URL)
             # Wait until an element is present on the page
-            element = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, signalElemName)))
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, signalElemName)))
             return True
         except:
             # Handle exceptions and retry
@@ -41,7 +41,6 @@ def writeToFile(contents, fileName):
 # 4 function to run on each page, write to files
 def processPage(browser, URL, outputFileName, failed, signalElemName, parser):
     if connectPage(browser, URL, signalElemName):
-        sleep(2)
         html = browser.page_source
         output = parser(html)
         writeToFile(output, outputFileName)
