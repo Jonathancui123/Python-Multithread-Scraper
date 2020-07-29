@@ -27,6 +27,12 @@ def parseUDPopularHTML(html):
     except Exception as e:
         print(f'Error parsing: {e}')
 
+
+def writeToFile(contents, file):
+    for row in contents:
+        file.write(row + "\n")
+
+
 if __name__ == '__main__':
     # 2. Handler script set up browser, to decide which pages to run the function on, track elapsed time, open and close files, 
     browser = getDriver()
@@ -42,7 +48,7 @@ if __name__ == '__main__':
     with open(popularLinks + output_filename, 'a') as file:
         for char in string.ascii_uppercase:
             print(f'Processing letter {char}')
-            processPage(browser, popularURL + char, file, failedURLs, "columnist", parseUDPopularHTML)
+            processPage(browser, popularURL + char, file, failedURLs, "columnist", parser=parseUDPopularHTML, writer=writeToFile)
             print(f'Done {char}')
             sleep(3)
     browser.quit()
