@@ -3,6 +3,7 @@ import string
 from time import sleep, time
 from bs4 import BeautifulSoup
 from scraper import getDriver, processPage
+from pathlib import Path
 
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -32,8 +33,12 @@ if __name__ == '__main__':
     # Put a timestamp on the output file
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.txt'
+    # Track elapsed time and failed URLs
     startTime = time()
     failedURLs = []
+    
+    # Make new folder if needed
+    Path(popularLinks).mkdir(parents=True, exist_ok=True)                
     with open(popularLinks + output_filename, 'a') as file:
         for char in string.ascii_uppercase:
             print(f'Processing letter {char}')

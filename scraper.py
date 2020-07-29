@@ -10,7 +10,8 @@ def getDriver():
     # 1. Set up browser
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
-    options.add_argument('log-level=3')
+    options.add_argument('log-level=3') # Only log errors
+    # Change path to point to your chrome driver: https://sites.google.com/a/chromium.org/chromedriver/downloads
     path = 'C:\\Users\\Jonathan Cui\\AppData\\Local\\ChromeWebdriver\\chromedriver.exe'
     driver = webdriver.Chrome(executable_path=os.path.normpath(path), chrome_options=options)
     return driver
@@ -33,12 +34,12 @@ def connectPage(browser, URL, signalElemName):
 
     return False
 
-# 3. Write to file given contents and a filename to write to 
+# 3. Write to file given contents and a file to write to 
 def writeToFile(contents, file):
     for row in contents:
         file.write(row + "\n")
  
-# 4 function to run on each page, write to files
+# 4 function to connect all above functions, write to file
 def processPage(browser, URL, outputFile, failed, signalElemName, parser):
     if connectPage(browser, URL, signalElemName):
         html = browser.page_source
