@@ -8,3 +8,4 @@ from time import sleep, time
 
 if __name__ == '__main__':
     # 2. Handler script set up browser, to decide which pages to run the function on, track elapsed time, open and close files, 
+    # close browser
