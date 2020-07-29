@@ -14,5 +14,5 @@ Note that the path to chromewebdriver.exe is hard coded in scraper.py
 
 ```python
 python -m getPopularLinks.py
-python -m <>
+python -m <second-module-name-tbd>
 ```
