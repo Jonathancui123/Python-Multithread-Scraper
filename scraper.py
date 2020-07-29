@@ -34,16 +34,16 @@ def connectPage(browser, URL, signalElemName):
     return False
 
 # 3. Write to file given contents and a filename to write to 
-def writeToFile(contents, fileName):
-    print("writing to file")
-    return
+def writeToFile(contents, file):
+    for row in contents:
+        file.write(row + "\n")
  
 # 4 function to run on each page, write to files
-def processPage(browser, URL, outputFileName, failed, signalElemName, parser):
+def processPage(browser, URL, outputFile, failed, signalElemName, parser):
     if connectPage(browser, URL, signalElemName):
         html = browser.page_source
         output = parser(html)
-        writeToFile(output, outputFileName)
+        writeToFile(output, outputFile)
     else:
         print(f'ERROR: Failed to connect to {URL}')
         failed.append(URL)
