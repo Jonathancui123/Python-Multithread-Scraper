@@ -1,11 +1,12 @@
 import datetime
-import string
 from time import sleep, time
 from bs4 import BeautifulSoup
-import csv
 from pathlib import Path
+import csv
 import os 
 from scraper import getDriver, processPage
+
+import concurrent.futures
 
 from getPopularLinks import popularLinks
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -34,8 +35,7 @@ def writeToCsv(dictionary, file):
 
 
 if __name__ == '__main__':
-    # 2. Handler script set up browser, to decide which pages to run the function on, track elapsed time, open and close files, 
-    browser = getDriver()
+    # 2. Handler script to decide which pages to run the function on, track elapsed time, open and close files, 
     # Put a timestamp on the output file
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.csv'
@@ -45,20 +45,21 @@ if __name__ == '__main__':
     
     # Read the newest file of popular links
     linkFiles = sorted([f for f in os.listdir(popularLinks) if os.path.isfile(os.path.join(popularLinks, f))])
-    popularLinksFile = linkFiles[0]
+    try: 
+        popularLinksFile = linkFiles[-1]
+    except:
+        raise('link file not found')
     print(f'Using link file: {popularLinksFile}')
 
     # Make new folder if needed
     Path(definitions).mkdir(parents=True, exist_ok=True)                
     with open(definitions + output_filename, 'a') as file, open(os.path.join(popularLinks, popularLinksFile), 'r') as sourceFile:
+        # threads = min(MAX_THREADS, len(story_urls))
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         for link in sourceFile:
             if(len(link) > 0):
                 link = link[:-1] #Remove newline character
-                print(f'Processing link {link}')
-                processPage(browser, link, file, failedURLs, "def-panel", parser=parseDefinition, writer=writeToCsv)
-                print(f'Done {link}')
-                sleep(3)
-    browser.quit()
+                processPage(link, file, failedURLs, "def-panel", parser=parseDefinition, writer=writeToCsv)
     endTime = time()
     elapsed_time = endTime - startTime
     print(f'Elapsed time: {elapsed_time}s with the following failures:')

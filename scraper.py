@@ -10,7 +10,7 @@ def getDriver():
     # 1. Set up browser
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
-    options.add_argument('log-level=3') # Only log errors
+    options.add_argument('log-level=1') # Only log errors
     # Change path to point to your chrome driver: https://sites.google.com/a/chromium.org/chromedriver/downloads
     path = 'C:\\Users\\Jonathan Cui\\AppData\\Local\\ChromeWebdriver\\chromedriver.exe'
     driver = webdriver.Chrome(executable_path=os.path.normpath(path), chrome_options=options)
@@ -22,9 +22,10 @@ def connectPage(browser, URL, signalElemName):
     while attempts < 3:
         # Try 3 times
         try:
+            print(f'Connecting...')
             browser.get(URL)
             # Wait until an element is present on the page
-            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, signalElemName)))
+            # WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, signalElemName)))
             return True
         except:
             # Handle exceptions and retry
@@ -35,14 +36,21 @@ def connectPage(browser, URL, signalElemName):
     return False
 
 
-# 3 function to connect all above functions, write to file
-def processPage(browser, URL, outputFile, failed, signalElemName, parser, writer):
+def processPage(URL, outputFile, failed, signalElemName, parser, writer):
+    # 3 function to connect all above functions, write to file
+    print(f'Processing link {URL}')
+    browser = getDriver()
     if connectPage(browser, URL, signalElemName):
         html = browser.page_source
         output = parser(html)
         writer(output, outputFile)
+        print('Done')
+        ret = True
     else:
         print(f'ERROR: Failed to connect to {URL}')
         failed.append(URL)
+        ret = False
+    browser.quit()
+    return ret
 
 

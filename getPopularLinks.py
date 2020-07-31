@@ -34,8 +34,7 @@ def writeToFile(contents, file):
 
 
 if __name__ == '__main__':
-    # 2. Handler script set up browser, to decide which pages to run the function on, track elapsed time, open and close files, 
-    browser = getDriver()
+    # 2. Handler script to decide which pages to run the function on, track elapsed time, open and close files, 
     # Put a timestamp on the output file
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.txt'
@@ -47,11 +46,8 @@ if __name__ == '__main__':
     Path(popularLinks).mkdir(parents=True, exist_ok=True)                
     with open(popularLinks + output_filename, 'a') as file:
         for char in string.ascii_uppercase:
-            print(f'Processing letter {char}')
-            processPage(browser, popularURL + char, file, failedURLs, "columnist", parser=parseUDPopularHTML, writer=writeToFile)
-            print(f'Done {char}')
+            processPage( popularURL + char, file, failedURLs, "columnist", parser=parseUDPopularHTML, writer=writeToFile)
             sleep(3)
-    browser.quit()
     endTime = time()
     elapsed_time = endTime - startTime
     print(f'Elapsed time: {elapsed_time}s with the following failures:')
