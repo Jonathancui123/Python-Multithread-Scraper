@@ -2,8 +2,10 @@ import datetime
 import string
 from time import sleep, time
 from bs4 import BeautifulSoup
-from scraper import getDriver, processPage
+from multithread_scraper.scraper import getDriver, processPage
 from pathlib import Path
+
+MAX_THREADS = 10
 
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -18,6 +20,7 @@ popularURL = "https://www.urbandictionary.com/popular.php?character="
 urbanDictionaryURL = "https://www.urbandictionary.com"
 
 def parseUDPopularHTML(html):
+    ''' Parser must return an iterable for the writer function'''
     try:
         soup = BeautifulSoup(html, 'html.parser')
         focus = soup.find(id="columnist")
@@ -46,7 +49,7 @@ if __name__ == '__main__':
     Path(popularLinks).mkdir(parents=True, exist_ok=True)                
     with open(popularLinks + output_filename, 'a') as file:
         for char in string.ascii_uppercase:
-            processPage( popularURL + char, file, failedURLs, "columnist", parser=parseUDPopularHTML, writer=writeToFile)
+            processPage( popularURL + char, file, failedURLs, signalElemName="columnist", parser=parseUDPopularHTML, writer=writeToFile)
             sleep(3)
     endTime = time()
     elapsed_time = endTime - startTime

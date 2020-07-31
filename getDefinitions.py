@@ -2,17 +2,18 @@ import datetime
 from time import sleep, time
 from bs4 import BeautifulSoup
 from pathlib import Path
-import csv
 import os 
-from scraper import getDriver, processPage
+from multithread_scraper.scraper import getDriver, processPage
+from concurrent.futures import ThreadPoolExecutor
 
-import concurrent.futures
+MAX_THREADS = 10
 
 from getPopularLinks import popularLinks
 dir_path = os.path.dirname(os.path.realpath(__file__))
 definitions = dir_path + '\\outputs\\definitions\\'
 
 def parseDefinition(html):
+    ''' Parser must return an iterable for the writer function'''
     soup = BeautifulSoup(html, 'html.parser')
     defPanel = soup.find(class_="def-panel")
     word = defPanel.find(class_="word").get_text()
@@ -26,12 +27,8 @@ def parseDefinition(html):
         'meaning': meaning,
         'example': example
     }
-    return wordDefinition
+    return [wordDefinition]
 
-def writeToCsv(dictionary, file):
-    fieldnames=['word','meaning','example']
-    writer = csv.DictWriter(file, fieldnames=fieldnames)
-    writer.writerow(dictionary)
 
 
 if __name__ == '__main__':
@@ -53,13 +50,15 @@ if __name__ == '__main__':
 
     # Make new folder if needed
     Path(definitions).mkdir(parents=True, exist_ok=True)                
+
+    with open(os.path.join(popularLinks, popularLinksFile), 'r') as sourceFile:
+        numLinks = len(sourceFile.readlines())
+
     with open(definitions + output_filename, 'a') as file, open(os.path.join(popularLinks, popularLinksFile), 'r') as sourceFile:
-        # threads = min(MAX_THREADS, len(story_urls))
-        # with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-        for link in sourceFile:
-            if(len(link) > 0):
-                link = link[:-1] #Remove newline character
-                processPage(link, file, failedURLs, "def-panel", parser=parseDefinition, writer=writeToCsv)
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            args = ([link for link in sourceFile], [failedURLs]*numLinks, ["def-panel"]*numLinks, [parseDefinition]*numLinks, [definitions + output_filename]*numLinks )
+            print(len(args[0]))
+            executor.map(processPage, *args)
     endTime = time()
     elapsed_time = endTime - startTime
     print(f'Elapsed time: {elapsed_time}s with the following failures:')
