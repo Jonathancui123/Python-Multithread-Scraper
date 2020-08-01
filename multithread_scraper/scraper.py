@@ -8,14 +8,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+driverPath = 'C:\\Users\\Jonathan Cui\\AppData\\Local\\ChromeWebdriver\\chromedriver.exe'
+
 def getDriver():
     '''Set up browser'''
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('log-level=1') # Only log errors
     # Change path to point to your chrome driver: https://sites.google.com/a/chromium.org/chromedriver/downloads
-    path = 'C:\\Users\\Jonathan Cui\\AppData\\Local\\ChromeWebdriver\\chromedriver.exe'
-    driver = webdriver.Chrome(executable_path=os.path.normpath(path), chrome_options=options)
+    driver = webdriver.Chrome(executable_path=os.path.normpath(driverPath), chrome_options=options)
     return driver
 
 def connectPage(browser, URL, signalElemName):
