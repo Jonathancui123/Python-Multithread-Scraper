@@ -1,26 +1,24 @@
 import datetime
 import string
-from time import sleep, time
-from bs4 import BeautifulSoup
-from multithread_scraper.scraper import getDriver, processPage
+import os
 from pathlib import Path
+from time import sleep, time
+from concurrent.futures import ThreadPoolExecutor
 
-MAX_THREADS = 10
+from bs4 import BeautifulSoup
 
-import os 
+from multithread_scraper.scraper import getDriver, processPage
+from multithread_scraper.timeit import timeit
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 popularLinks = dir_path + '\\outputs\\popularLinks\\'
-
-#Track elapsesd time throughout the project
-
-# 3. Parse HTML (capture info from each page -- given an html file)
-# Return a list of content
+MAX_THREADS = 10
 
 popularURL = "https://www.urbandictionary.com/popular.php?character="
 urbanDictionaryURL = "https://www.urbandictionary.com"
 
 def parseUDPopularHTML(html):
-    ''' Parser must return an iterable for the writer function'''
+    ''' Parser reads html and gives links. Must return an iterable for the writer function'''
     try:
         soup = BeautifulSoup(html, 'html.parser')
         focus = soup.find(id="columnist")
@@ -29,29 +27,33 @@ def parseUDPopularHTML(html):
         return outputLinks
     except Exception as e:
         print(f'Error parsing: {e}')
+        return []
 
-
-def writeToFile(contents, file):
-    for row in contents:
-        file.write(row + "\n")
-
-
-if __name__ == '__main__':
-    # 2. Handler script to decide which pages to run the function on, track elapsed time, open and close files, 
+@timeit
+def getPopularLinks():
+    '''Handler script to decide which pages to scrape and create folders '''
     # Put a timestamp on the output file
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.txt'
-    # Track elapsed time and failed URLs
-    startTime = time()
+    
     failedURLs = []
     
     # Make new folder if needed
-    Path(popularLinks).mkdir(parents=True, exist_ok=True)                
-    with open(popularLinks + output_filename, 'a') as file:
-        for char in string.ascii_uppercase:
-            processPage( popularURL + char, file, failedURLs, signalElemName="columnist", parser=parseUDPopularHTML, writer=writeToFile)
-            sleep(3)
-    endTime = time()
-    elapsed_time = endTime - startTime
-    print(f'Elapsed time: {elapsed_time}s with the following failures:')
+    Path(popularLinks).mkdir(parents=True, exist_ok=True) 
+                   
+    with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+        # Format arguments as iterable for threadpoolexecutor
+        count = len(string.ascii_uppercase)
+        args = [[popularURL + char for char in string.ascii_uppercase], [failedURLs], ["columnist"], [parseUDPopularHTML], [popularLinks + output_filename]]
+        for i in range(1, len(args)):
+            args[i] = args[i] * count
+
+        # Submit jobs to executor
+        executor.map(processPage, *args)
+
+    print('Failed URLs:')
     print(failedURLs)
+    
+
+if __name__ == '__main__':
+    getPopularLinks()
