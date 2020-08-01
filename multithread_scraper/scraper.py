@@ -69,7 +69,7 @@ class WriterThread(ThreadPoolExecutor):
                 writer.writerow(newDict)
             self.count += 1
             elapsed = time() - self.startTime
-            print(f'Finished writing job #{self.count}... ({elapsed/self.count}s per job)')
+            print(f'Finished writing job #{self.count}... (avg {elapsed/self.count}s per job)')
 
     def writeCsv(self, dicts, fileName):
         ''' 
