@@ -13,8 +13,8 @@ Find dependencies in requirements.txt
 ```bash
 pip install requirements.txt
 ```
-
-Note that the path to chromewebdriver.exe is hard coded in scraper.py
+Install Chrome Webdriver for selenium: https://chromedriver.chromium.org/downloads
+Modify the driverPath variable in scraper.py to point to your installation
 
 ## Usage
 
