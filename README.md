@@ -1,8 +1,10 @@
 # Python-Multithread-Scraper
-Quick project to learn about multithreading in python and web scraping with Selenium + BeautifulSoup.
+Python-Multithread-Scraper is a project for me to learn about multithreading in python and web scraping with Selenium + BeautifulSoup.
+
 This project is set up to scrape ~3.6k of the most viewed definitions from the popular site UrbanDictionary.com
 
 getPopularLinks.py scrapes links to the most popular words from Urban Dictionary's "most popular words by letter" pages - exports a .txt file
+
 getDefinitions.py scrapes the top definition for each popular word - exports a .csv file with the word, the meaning, and an example in each row
 
 ## Installation
